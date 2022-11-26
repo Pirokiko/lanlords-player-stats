@@ -1,11 +1,6 @@
-import logo from "../assets/virginia_cavaliers.png";
 import personImg from "../assets/person.jfif";
-
-export type Team = {
-  id: number;
-  name: string;
-  img: string;
-};
+import { Game } from "./Game";
+import { fieldFuckers, Team } from "./Team";
 
 export type Player = {
   id: number;
@@ -16,26 +11,14 @@ export type Player = {
   scores: Scores;
 };
 
-enum Games {
-  BF1942 = "BF1942",
-  BF2142 = "BF2142",
-  COD2 = "COD2",
-  COD4 = "COD4",
-  COD5 = "COD5",
-  TF2 = "TF2",
-  CSGO = "CSGO",
-}
+export type PlayerProp = {
+  player: Player;
+};
 
 // ELO implementation based on a range of 0 - 5000
 // Average is 2500
 type Scores = {
-  [K in Games]?: number;
-};
-
-export const fieldFuckers: Team = {
-  id: 1,
-  name: "FieldFuckers",
-  img: logo,
+  [K in Game]?: number;
 };
 
 export const pirokiko: Player = {
@@ -53,4 +36,21 @@ export const pirokiko: Player = {
     TF2: 2600,
     CSGO: 2750,
   },
+};
+
+export const fieldFuckerMembers = [
+  pirokiko,
+  pirokiko,
+  pirokiko,
+  pirokiko,
+  pirokiko,
+  pirokiko,
+  pirokiko,
+  pirokiko,
+];
+
+export const elo = (player: Player) => {
+  const elos = Object.values(player.scores);
+  const total = elos.reduce((a, b) => a + b, 0);
+  return Math.floor(total / elos.length);
 };

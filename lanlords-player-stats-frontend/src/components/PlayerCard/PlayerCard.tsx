@@ -1,14 +1,8 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
-  Grid,
-  List,
-  ListItem,
-} from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Grid } from "@mui/material";
+import { Fragment } from "react";
 import { FC } from "react";
-import { Player } from "../../types/Player";
+import { Game } from "../../types/Game";
+import { elo, Player, PlayerProp } from "../../types/Player";
 
 const styles = {
   logo: {
@@ -26,28 +20,20 @@ const styles = {
   },
 } as const;
 
-type PlayerProp = {
-  player: Player;
-};
-
 const PlayerHeader: FC<PlayerProp> = ({ player }) => (
   <Grid container>
-    <Grid item xs={1}>
+    <Grid item xs={2}>
       <img src={player.team.img} style={styles.logo} alt="team image" />
     </Grid>
-    <Grid item xs={11} display="flex" alignItems="center" pl={1}>
-      {player.name}
+    <Grid item xs={10} display="flex" alignItems="center" pl={1}>
+      {player.handle} | {player.name}
     </Grid>
   </Grid>
 );
 
 export const PlayerCard: FC<PlayerProp> = ({ player }) => (
   <Card variant="elevation" raised sx={styles.card}>
-    <CardHeader
-      title={<PlayerHeader player={player} />}
-      dividers
-      sx={styles.header}
-    />
+    <CardHeader title={<PlayerHeader player={player} />} sx={styles.header} />
     <Box
       component={CardContent}
       display="grid"
@@ -57,24 +43,47 @@ export const PlayerCard: FC<PlayerProp> = ({ player }) => (
       <div>
         <img src={player.img} style={styles.playerImg} alt="player image" />
         <div>MMR</div>
-        <div>2500</div>
+        <div>{elo(player)}</div>
       </div>
-      <Grid container>
-        <Grid item xs={6}>
-          <List dense>
-            <ListItem>1942: 250</ListItem>
-            <ListItem>BF2: 250</ListItem>
-            <ListItem>TF2: 250</ListItem>
-          </List>
-        </Grid>
-        <Grid item xs={6}>
-          <List dense>
-            <ListItem>COD2: 250</ListItem>
-            <ListItem>COD4: 250</ListItem>
-            <ListItem>CSGO: 250</ListItem>
-          </List>
-        </Grid>
-      </Grid>
+      <ScoreListing player={player} />
     </Box>
   </Card>
 );
+
+const ScoreListing: FC<PlayerProp> = ({ player: { scores } }) => {
+  const keys = Object.keys(scores) as Game[];
+  const half = Math.ceil(keys.length / 2);
+  const first = keys.slice(0, half);
+  const second = keys.slice(half);
+
+  return (
+    <Grid container>
+      <Grid item xs={6}>
+        <ScoresList scores={scores} games={first} />
+      </Grid>
+      <Grid item xs={6}>
+        <ScoresList scores={scores} games={second} />
+      </Grid>
+    </Grid>
+  );
+};
+
+const ScoresList: FC<{ scores: Player["scores"]; games: Game[] }> = ({
+  scores,
+  games,
+}) => {
+  return (
+    <Grid container columnSpacing={1}>
+      {games.map((game) => (
+        <Fragment key={game}>
+          <Grid item xs={6} textAlign="end">
+            {game}
+          </Grid>
+          <Grid item xs={6} textAlign="start">
+            {scores[game]}
+          </Grid>
+        </Fragment>
+      ))}
+    </Grid>
+  );
+};
