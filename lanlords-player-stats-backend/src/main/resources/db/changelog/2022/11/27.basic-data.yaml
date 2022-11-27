@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-team
+      author: pirokiko
+      changes:
+        - createTable:
+            tableName: team
+            columns:
+              - name: id
+                type: BIGINT
+                constraints:
+                  nullable: false
+              - name: name
+                type: text
+  - changeSet:
+      id: create-player
+      author: pirokiko
+      changes:
+        - createTable:
+            tableName: player
+            columns:
+              - name: id
+                type: BIGINT
+                constraints:
+                  nullable: false
+              - name: name
+                type: text
+              - name: handle
+                type: text
+              - name: team_id
+                type: BIGINT
+  - changeSet:
+      id: create-ranking
+      author: pirokiko
+      changes:
+        - createTable:
+            tableName: ranking
+            columns:
+              - name: id
+                type: BIGINT
+                constraints:
+                  nullable: false
+              - name: game
+                type: text
+              - name: player_id
+                type: BIGINT
+              - name: score
+                type: BIGINT
