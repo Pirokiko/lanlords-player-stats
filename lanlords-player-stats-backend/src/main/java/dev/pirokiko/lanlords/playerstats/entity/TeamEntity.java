@@ -18,6 +18,8 @@ public class TeamEntity {
   @Id private Long id;
   private String name;
 
+  private double rating;
+
   private int winCount;
   private int lossCount;
   private int drawCount;

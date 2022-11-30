@@ -25,7 +25,7 @@ class TeamTest {
 
     final var team = new Team(teamEntity, List.of(player1, player2, player3));
 
-    team.updateRating(100, new Match.Contributions(Map.of(player1, 1.0, player2, 1.0,player3, 3.0)));
+    team.updateRating(100, new Contributions(Map.of(player1, 1.0, player2, 1.0, player3, 3.0)));
 
     assertEquals("player1.rating()", 770.0, player1.rating());
     assertEquals("player2.rating()", 520.0, player2.rating());
@@ -46,8 +46,7 @@ class TeamTest {
 
     final var team = new Team(teamEntity, List.of(player1, player2, player3));
 
-    team.updateRating(-70, new Match.Contributions(Map.of(player1, 1.0, player2, 1.0,player3, 3.0)));
-
+    team.updateRating(-70, new Contributions(Map.of(player1, 1.0, player2, 1.0, player3, 3.0)));
 
     assertEquals("player1.rating()", 720.0, player1.rating()); // -30
     assertEquals("player2.rating()", 470.0, player2.rating()); // -30

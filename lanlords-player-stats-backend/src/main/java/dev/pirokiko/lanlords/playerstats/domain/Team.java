@@ -1,11 +1,12 @@
 package dev.pirokiko.lanlords.playerstats.domain;
 
+import dev.pirokiko.lanlords.playerstats.elo.EloEntity;
 import dev.pirokiko.lanlords.playerstats.entity.PlayerEntity;
 import dev.pirokiko.lanlords.playerstats.entity.TeamEntity;
 
 import java.util.List;
 
-public record Team(TeamEntity team, List<PlayerEntity> members) {
+public record Team(TeamEntity team, List<PlayerEntity> members) implements EloEntity {
 
   public String name() {
     return team.name();
@@ -21,18 +22,22 @@ public record Team(TeamEntity team, List<PlayerEntity> members) {
         / members.size();
   }
 
-  public void updateRating(double ratingOffset, Match.Contributions contributions) {
+  public void updateRating(double ratingOffset) {
+    team.rating(team.rating() + ratingOffset);
+  }
+
+  public void updateRating(double ratingOffset, Contributions contributions) {
     if (ratingOffset == 0) return;
     if (ratingOffset > 0) {
       applyRating(ratingOffset, contributions);
     } else {
-      // inverse so more contributing members lose less
+      // inverse so more contributing players lose less
       applyRating(ratingOffset, contributions.inverse());
     }
   }
 
   // @TODO: Determine if this code (and callers) should still be here as it doesn't use the instance
-  private void applyRating(double ratingOffset, Match.Contributions contributions) {
+  private void applyRating(double ratingOffset, Contributions contributions) {
     contributions
         .normalized() // ensure all are proportionally scaled for a total value of 1.0
         .forEach(
