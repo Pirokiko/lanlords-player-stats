@@ -1,15 +1,15 @@
 package dev.pirokiko.lanlords.playerstats.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor
 @Entity
+@NoArgsConstructor
 @Data
 @Accessors(fluent = true)
 public class PlayerEntity {
@@ -20,8 +20,15 @@ public class PlayerEntity {
   private int winCount;
   private int lossCount;
   private int drawCount;
-  private double rating;
 
+  @OneToMany(cascade = CascadeType.PERSIST)
+  private List<AbilityEntity> abilities;
+
+  private double rating; // Replace with an AbilityEntity with GENERAL type in abilities
+
+  // Maybe not define it as a hard requirement: a player competes with a team, but can compete for a
+  // different team next time; so it might not be a hard defined thing and should be defined when
+  // building the team for processing the matches
   @ManyToOne private TeamEntity team;
 
   public void updateRating(double offset) {
