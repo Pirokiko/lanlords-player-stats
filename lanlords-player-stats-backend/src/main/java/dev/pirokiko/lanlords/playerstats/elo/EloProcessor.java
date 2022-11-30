@@ -1,6 +1,8 @@
-package dev.pirokiko.lanlords.playerstats.domain;
+package dev.pirokiko.lanlords.playerstats.elo;
 
-import dev.pirokiko.lanlords.playerstats.domain.config.EloSettings;
+import dev.pirokiko.lanlords.playerstats.config.EloSettings;
+import dev.pirokiko.lanlords.playerstats.domain.Match;
+import dev.pirokiko.lanlords.playerstats.domain.Team;
 
 public class EloProcessor {
   private final EloSettings settings;
@@ -16,8 +18,8 @@ public class EloProcessor {
 
     double firstRatingOffset = this.newRating(match, team1, team2) - team1.rating();
     double secondRatingOffset = this.newRating(match, team2, team1) - team2.rating();
-    team1.updateRating(firstRatingOffset);
-    team2.updateRating(secondRatingOffset);
+    team1.updateRating(firstRatingOffset, match.contribution(team1));
+    team2.updateRating(secondRatingOffset, match.contribution(team2));
     updateWinLossCounts(match);
   }
 

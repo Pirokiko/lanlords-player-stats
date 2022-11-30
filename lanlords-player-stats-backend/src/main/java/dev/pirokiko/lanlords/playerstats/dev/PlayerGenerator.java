@@ -1,6 +1,6 @@
-package dev.pirokiko.lanlords.playerstats.domain.dev;
+package dev.pirokiko.lanlords.playerstats.dev;
 
-import dev.pirokiko.lanlords.playerstats.domain.config.EloSettings;
+import dev.pirokiko.lanlords.playerstats.config.EloSettings;
 import dev.pirokiko.lanlords.playerstats.entity.PlayerEntity;
 import dev.pirokiko.lanlords.playerstats.entity.TeamEntity;
 import lombok.RequiredArgsConstructor;

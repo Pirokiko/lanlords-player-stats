@@ -3,9 +3,12 @@ package dev.pirokiko.lanlords.playerstats.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.Accessors;
 
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 @Entity
 @Data
 @Accessors(fluent = true)

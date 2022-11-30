@@ -1,4 +1,4 @@
-package dev.pirokiko.lanlords.playerstats.domain.config;
+package dev.pirokiko.lanlords.playerstats.config;
 
 import lombok.Value;
 

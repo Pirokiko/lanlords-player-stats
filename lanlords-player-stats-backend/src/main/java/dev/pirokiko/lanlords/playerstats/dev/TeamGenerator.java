@@ -1,4 +1,4 @@
-package dev.pirokiko.lanlords.playerstats.domain.dev;
+package dev.pirokiko.lanlords.playerstats.dev;
 
 import dev.pirokiko.lanlords.playerstats.domain.Team;
 import dev.pirokiko.lanlords.playerstats.entity.TeamEntity;
