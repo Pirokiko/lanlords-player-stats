@@ -1,6 +1,6 @@
 package dev.pirokiko.lanlords.playerstats.model;
 
-public enum AbilityType {
+public enum Ability {
   GENERAL,
   KILLS,
   DEATHS,

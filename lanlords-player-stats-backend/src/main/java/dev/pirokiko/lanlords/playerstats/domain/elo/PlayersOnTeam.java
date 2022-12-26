@@ -2,40 +2,47 @@ package dev.pirokiko.lanlords.playerstats.domain.elo;
 
 import dev.pirokiko.lanlords.playerstats.domain.Contributions;
 import dev.pirokiko.lanlords.playerstats.elo.EloEntity;
+import dev.pirokiko.lanlords.playerstats.entity.AbilityEntity;
 import dev.pirokiko.lanlords.playerstats.entity.PlayerEntity;
 
 import java.util.List;
+import java.util.Optional;
 
-public record PlayersOnTeam(List<PlayerEntity> players, Contributions contributions) implements EloEntity {
+public record PlayersOnTeam(
+    List<PlayerEntity> players, Contributions contributions, EloContext eloContext)
+    implements EloEntity {
+
+  public List<AbilityEntity> abilities() {
+    return players.stream()
+        .map(player -> player.ability(eloContext.game(), eloContext.ability()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
 
   public double rating() {
-    return players.stream().reduce(0d, (acc, member) -> member.rating(), Double::sum)
-        / players.size();
+    final var abilities = abilities();
+    if (abilities.isEmpty()) return 0d;
+
+    return abilities.stream().reduce(0d, (acc, ability) -> ability.rating(), Double::sum)
+        / abilities.size();
   }
 
   public int numberOfGamesPlayed() {
-    return players.stream().reduce(0, (acc, member) -> member.numberOfGamesPlayed(), Integer::sum)
-        / players.size();
+    final var abilities = abilities();
+    if (abilities.isEmpty()) return 0;
+
+    return abilities.stream().reduce(0, (acc, ability) -> ability.gamesPlayed(), Integer::sum)
+        / abilities.size();
   }
 
   public void updateRating(double ratingOffset) {
     if (ratingOffset == 0) return;
     if (ratingOffset > 0) {
-      applyRating(ratingOffset, contributions);
+      contributions.applyRating(ratingOffset);
     } else {
       // inverse so more contributing players lose less
-      applyRating(ratingOffset, contributions.inverse());
+      contributions.inverse().applyRating(ratingOffset);
     }
-  }
-
-  private void applyRating(double ratingOffset, Contributions contributions) {
-    contributions
-        .normalized() // ensure all are proportionally scaled for a total value of 1.0
-        .forEach(
-            (contribution) -> {
-              final var member = contribution.player();
-              final var contributionPart = contribution.contribution();
-              member.updateRating(ratingOffset * contributionPart);
-            });
   }
 }

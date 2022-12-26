@@ -1,6 +1,5 @@
 package dev.pirokiko.lanlords.playerstats.domain;
 
-
 import dev.pirokiko.lanlords.playerstats.entity.PlayerEntity;
 import dev.pirokiko.lanlords.playerstats.util.MappingIterator;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +17,15 @@ public class Contributions implements Iterable<Contributions.Contribution> {
 
     public Contributions normalized() {
         final var total = contributions.values().stream().mapToDouble(v -> v).sum();
-        return new Contributions(
-                contributions.entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() / total)));
+    return new Contributions(
+        contributions.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() / total)));
     }
 
     public Contributions inverse() {
-        return new Contributions(
-                contributions.entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, e -> 1.0 / e.getValue())));
+    return new Contributions(
+        contributions.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> 1.0 / e.getValue())));
     }
 
     @Override
@@ -34,4 +33,16 @@ public class Contributions implements Iterable<Contributions.Contribution> {
         return new MappingIterator<>(
                 contributions.entrySet().iterator(), e -> new Contribution(e.getKey(), e.getValue()));
     }
+
+  public void applyRating(double ratingOffset) {
+    this.normalized() // ensure all are proportionally scaled for a total value of 1.0
+        .forEach(
+            (contribution) -> {
+              final var member = contribution.player();
+              final var ability =
+                  member.ability(eloContext.game(), eloContext.ability()).orElseThrow();
+              final var contributionPart = contribution.contribution();
+              ability.rating(ability.rating() + ratingOffset * contributionPart);
+            });
+  }
 }

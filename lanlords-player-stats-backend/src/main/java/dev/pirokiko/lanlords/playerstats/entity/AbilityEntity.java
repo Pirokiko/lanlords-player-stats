@@ -1,6 +1,6 @@
 package dev.pirokiko.lanlords.playerstats.entity;
 
-import dev.pirokiko.lanlords.playerstats.model.AbilityType;
+import dev.pirokiko.lanlords.playerstats.model.Ability;
 import dev.pirokiko.lanlords.playerstats.model.Game;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,7 +20,15 @@ public class AbilityEntity {
   private Game game;
 
   @Enumerated(EnumType.STRING)
-  private AbilityType type;
+  private Ability ability;
 
   private double rating;
+
+  private int gamesWon;
+  private int gamesLost;
+  private int gamesDrawn;
+
+  public int gamesPlayed() {
+    return gamesWon + gamesDrawn + gamesLost;
+  }
 }

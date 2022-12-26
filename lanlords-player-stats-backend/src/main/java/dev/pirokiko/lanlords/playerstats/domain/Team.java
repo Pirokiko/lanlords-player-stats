@@ -1,71 +1,92 @@
 package dev.pirokiko.lanlords.playerstats.domain;
 
+import dev.pirokiko.lanlords.playerstats.domain.elo.EloContext;
 import dev.pirokiko.lanlords.playerstats.elo.EloEntity;
+import dev.pirokiko.lanlords.playerstats.entity.AbilityEntity;
+import dev.pirokiko.lanlords.playerstats.entity.OrganisationEntity;
 import dev.pirokiko.lanlords.playerstats.entity.PlayerEntity;
-import dev.pirokiko.lanlords.playerstats.entity.TeamEntity;
 
 import java.util.List;
+import java.util.Optional;
 
-public record Team(TeamEntity team, List<PlayerEntity> members) implements EloEntity {
+/**
+ * Represents a team as given shape during a tournament within a match. The EloContext allows for
+ * switching the game or ability type to allow processors dynamic access.
+ */
+public record Team(OrganisationEntity team, List<PlayerEntity> members, EloContext eloContext)
+    implements EloEntity {
 
   public String name() {
     return team.name();
   }
 
+  private List<AbilityEntity> memberAbilities() {
+    return members.stream()
+        .map(member -> member.ability(eloContext.game(), eloContext.ability()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+  }
+
+  private AbilityEntity teamAbility() {
+    return team.ability(eloContext.game(), eloContext.ability()).orElseThrow();
+  }
+
   public double rating() {
-    return members.stream().reduce(0d, (acc, member) -> member.rating(), Double::sum)
-        / members.size();
+    final var abilities = memberAbilities();
+    if (abilities.isEmpty()) return 0;
+
+    return abilities.stream().reduce(0d, (acc, ability) -> ability.rating(), Double::sum)
+        / abilities.size();
   }
 
   public int numberOfGamesPlayed() {
-    return members.stream().reduce(0, (acc, member) -> member.numberOfGamesPlayed(), Integer::sum)
-        / members.size();
+    final var abilities = memberAbilities();
+    if (abilities.isEmpty()) return 0;
+
+    return abilities.stream().reduce(0, (acc, ability) -> ability.gamesPlayed(), Integer::sum)
+        / abilities.size();
   }
 
   public void updateRating(double ratingOffset) {
-    team.rating(team.rating() + ratingOffset);
+    final var ability = teamAbility();
+    ability.rating(ability.rating() + ratingOffset);
   }
 
   public void updateRating(double ratingOffset, Contributions contributions) {
     if (ratingOffset == 0) return;
     if (ratingOffset > 0) {
-      applyRating(ratingOffset, contributions);
+      contributions.applyRating(ratingOffset);
     } else {
       // inverse so more contributing players lose less
-      applyRating(ratingOffset, contributions.inverse());
+      contributions.inverse().applyRating(ratingOffset);
     }
   }
 
-  // @TODO: Determine if this code (and callers) should still be here as it doesn't use the instance
-  private void applyRating(double ratingOffset, Contributions contributions) {
-    contributions
-        .normalized() // ensure all are proportionally scaled for a total value of 1.0
-        .forEach(
-            (contribution) -> {
-              final var member = contribution.player();
-              final var contributionPart = contribution.contribution();
-              member.updateRating(ratingOffset * contributionPart);
-            });
-  }
-
   public void incrementWinCount() {
-    team.incrementWinCount();
-    for (PlayerEntity member : members()) {
-      member.incrementWinCount();
+    final var teamAbility = teamAbility();
+    teamAbility.gamesWon(teamAbility.gamesWon() + 1); // This one or
+    //    teamAbility.incrementGamesWon(); // is this beter?
+    for (AbilityEntity ability : memberAbilities()) {
+      ability.gamesWon(ability.gamesWon() + 1);
     }
   }
 
   public void incrementLossCount() {
-    team.incrementLossCount();
-    for (PlayerEntity member : members()) {
-      member.incrementLossCount();
+    final var teamAbility = teamAbility();
+    teamAbility.gamesLost(teamAbility.gamesLost() + 1); // This one or
+    //    teamAbility.incrementGamesWon(); // is this beter?
+    for (AbilityEntity ability : memberAbilities()) {
+      ability.gamesLost(ability.gamesLost() + 1);
     }
   }
 
   public void incrementDrawCount() {
-    team.incrementDrawCount();
-    for (PlayerEntity member : members()) {
-      member.incrementDrawCount();
+    final var teamAbility = teamAbility();
+    teamAbility.gamesDrawn(teamAbility.gamesDrawn() + 1); // This one or
+    //    teamAbility.incrementGamesWon(); // is this beter?
+    for (AbilityEntity ability : memberAbilities()) {
+      ability.gamesDrawn(ability.gamesDrawn() + 1);
     }
   }
 }

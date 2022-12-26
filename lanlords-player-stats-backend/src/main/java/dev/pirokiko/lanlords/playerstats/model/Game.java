@@ -1,6 +1,7 @@
 package dev.pirokiko.lanlords.playerstats.model;
 
 public enum Game {
+  GENERIC,
   BF1942,
   BF2142,
   COD2,

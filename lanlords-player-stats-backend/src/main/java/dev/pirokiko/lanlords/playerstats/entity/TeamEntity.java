@@ -2,6 +2,7 @@ package dev.pirokiko.lanlords.playerstats.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,25 +20,8 @@ import java.util.List;
 @Accessors(fluent = true)
 public class TeamEntity {
   @Id private Long id;
-  private String name;
-
-  private double rating; // Replace with an AbilityEntity with GENERAL type in abilities
-
+  @ManyToOne private OrganisationEntity organisation;
+  @OneToMany private List<PlayerEntity> members;
+  private String tournament; // In which tournament did this team composition play?
   @OneToMany private List<AbilityEntity> abilities;
-
-  private int winCount;
-  private int lossCount;
-  private int drawCount;
-
-  public void incrementWinCount() {
-    winCount += 1;
-  }
-
-  public void incrementLossCount() {
-    lossCount += 1;
-  }
-
-  public void incrementDrawCount() {
-    drawCount += 1;
-  }
 }

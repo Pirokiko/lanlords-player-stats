@@ -4,7 +4,7 @@ import dev.pirokiko.lanlords.playerstats.config.EloSettings;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-abstract class BaseEloProcessor<T extends EloEntity> implements EloProcessor<T> {
+public abstract class BaseEloProcessor<T extends EloEntity> implements EloProcessor<T> {
   private final EloSettings settings;
 
   @Override

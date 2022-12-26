@@ -1,8 +1,9 @@
-package dev.pirokiko.lanlords.playerstats.elo;
+package dev.pirokiko.lanlords.playerstats.domain;
 
 import dev.pirokiko.lanlords.playerstats.config.EloSettings;
-import dev.pirokiko.lanlords.playerstats.domain.Match;
-import dev.pirokiko.lanlords.playerstats.domain.Team;
+import dev.pirokiko.lanlords.playerstats.elo.BaseEloProcessor;
+import dev.pirokiko.lanlords.playerstats.elo.EloMatches;
+import dev.pirokiko.lanlords.playerstats.elo.EloProcessor;
 
 import java.util.List;
 
